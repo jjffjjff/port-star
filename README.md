@@ -1,7 +1,34 @@
-# Tauri + SvelteKit + TypeScript
+# port-star
 
-This template should help get you started developing with Tauri, SvelteKit and TypeScript in Vite.
+Windows system-tray utility that lists every listening TCP port with its process name, icon, and a kill button.
 
-## Recommended IDE Setup
+## What it does
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+- Click the tray icon: compact frameless popover lists all active listeners
+- Each row: app icon, port number, process name, open-in-browser button, kill button
+- Search bar filters by name or `:port`
+- Kill matching: kills every row surviving the current filter
+- Pop out: converts the popover to a normal resizable window with taskbar entry
+- Shield badge on rows that need elevation to kill
+- Settings: launch at startup toggle, quit
+
+## Stack
+
+Tauri 2 (Rust) + Svelte 5 + TypeScript. Windows only.
+
+## Dev
+
+```
+pnpm install
+pnpm tauri dev
+```
+
+## Build
+
+```
+pnpm tauri build
+```
+
+Outputs in `src-tauri/target/release/bundle/`:
+- `msi/port-star_0.1.0_x64_en-US.msi`
+- `nsis/port-star_0.1.0_x64-setup.exe`

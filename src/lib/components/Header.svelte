@@ -40,9 +40,11 @@
         ⬆
       </button>
     {/if}
-    <button onclick={onPopOut} title="Pop out" aria-label="Pop out window">
-      ⧉
-    </button>
+    {#if mode !== "popped"}
+      <button onclick={onPopOut} title="Pop out" aria-label="Pop out window">
+        ⧉
+      </button>
+    {/if}
     <button onclick={onOpenSettings} title="Settings" aria-label="Open settings">
       ⚙
     </button>
