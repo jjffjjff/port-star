@@ -1,20 +1,23 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
 
-  let { onClose }: { onClose: () => void } = $props();
+  let { onClose, isElevated }: { onClose: () => void; isElevated: boolean } = $props();
 
   let autostart = $state(false);
+  let autostartElevated = $state(false);
   let loading = $state(true);
 
   $effect(() => {
-    invoke<boolean>("get_autostart")
-      .then((val) => {
-        autostart = val;
+    Promise.all([
+      invoke<boolean>("get_autostart"),
+      invoke<boolean>("get_autostart_elevated"),
+    ])
+      .then(([a, e]) => {
+        autostart = a;
+        autostartElevated = e;
         loading = false;
       })
-      .catch(() => {
-        loading = false;
-      });
+      .catch(() => { loading = false; });
   });
 
   async function toggleAutostart() {
@@ -24,6 +27,16 @@
       await invoke("set_autostart", { enabled: next });
     } catch {
       autostart = !next;
+    }
+  }
+
+  async function toggleAutostartElevated() {
+    const next = !autostartElevated;
+    autostartElevated = next;
+    try {
+      await invoke("set_autostart_elevated", { enabled: next });
+    } catch {
+      autostartElevated = !next;
     }
   }
 </script>
@@ -50,6 +63,33 @@
         {autostart ? "ON" : "OFF"}
       </button>
     {/if}
+  </div>
+
+  <div class="setting-row" class:muted={!isElevated}>
+    <label for="autostart-elevated-toggle">Start elevated</label>
+    {#if loading}
+      <span class="loading">…</span>
+    {:else}
+      <div class="toggle-wrap" title={!isElevated ? "Relaunch as admin to enable" : undefined}>
+        {#if !isElevated}<span class="lock">🔒</span>{/if}
+        <button
+          id="autostart-elevated-toggle"
+          class="toggle"
+          class:on={autostartElevated}
+          onclick={toggleAutostartElevated}
+          disabled={!isElevated}
+          role="switch"
+          aria-checked={autostartElevated}
+        >
+          {autostartElevated ? "ON" : "OFF"}
+        </button>
+      </div>
+    {/if}
+  </div>
+
+  <div class="setting-row">
+    <label>Quit PortStar</label>
+    <button class="quit-btn" onclick={() => invoke("quit_app")}>Quit</button>
   </div>
 </div>
 
@@ -126,9 +166,46 @@
     color: var(--fg);
   }
 
+  .toggle:disabled {
+    opacity: 0.35;
+  }
+
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .lock {
+    font-size: 10px;
+    opacity: 0.5;
+  }
+
+  .muted label {
+    opacity: 0.45;
+  }
+
   .toggle.on {
     color: var(--accent);
     border-color: var(--accent);
     background: color-mix(in srgb, var(--accent) 12%, var(--bg));
+  }
+
+  .quit-btn {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--danger);
+    padding: 2px 10px;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
+    background: transparent;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+
+  .quit-btn:hover {
+    background: color-mix(in srgb, var(--danger) 12%, var(--bg));
+    border-color: var(--danger);
   }
 </style>

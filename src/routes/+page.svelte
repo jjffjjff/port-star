@@ -14,7 +14,13 @@
   let search = $state("");
   let alwaysOnTop = $state(false);
   let showSettings = $state(false);
+  let isElevated = $state(false);
   let killError = $state<string | null>(null);
+  let killSuccess = $state<string | null>(null);
+
+  let hasElevatedProcesses = $derived(ports?.some((e) => e.needs_elevation) ?? false);
+  let hoveringElevationBanner = $state(false);
+  let hoveringElevatedRow = $state(false);
   let searchEl = $state<HTMLInputElement | undefined>(undefined);
 
   // Filtered list
@@ -72,14 +78,23 @@
   // Kill a process
   async function handleKill(pid: number) {
     killError = null;
+    killSuccess = null;
     try {
       await invoke("kill_process", { pid });
       await loadPorts();
+      killSuccess = "Process killed";
+      setTimeout(() => { killSuccess = null; }, 2000);
     } catch (err) {
-      killError = String(err);
-      setTimeout(() => {
-        killError = null;
-      }, 3000);
+      const msg = String(err);
+      if (msg === "elevation_cancelled") {
+        // do nothing — user dismissed the relaunch prompt
+      } else if (msg === "needs_elevation") {
+        // banner already visible via hasElevatedProcesses
+      } else {
+        killError = msg;
+        setTimeout(() => { killError = null; }, 3000);
+      }
+      setTimeout(() => { killError = null; }, 3000);
     }
   }
 
@@ -95,14 +110,33 @@
   // Kill all matching
   async function handleKillMatching() {
     const targets = filtered.map((e) => e.pid);
+    let killed = 0;
     for (const pid of targets) {
       try {
         await invoke("kill_process", { pid });
+        killed++;
       } catch {
         // continue
       }
     }
     await loadPorts();
+    if (killed > 0) {
+      killSuccess = `${killed} process${killed === 1 ? "" : "es"} killed`;
+      setTimeout(() => { killSuccess = null; }, 2000);
+    }
+  }
+
+  // Relaunch as admin (one UAC prompt, then all kills work for the session)
+  async function handleRelaunchAsAdmin() {
+    try {
+      await invoke("relaunch_as_admin");
+    } catch (err) {
+      const msg = String(err);
+      if (msg !== "elevation_cancelled") {
+        killError = msg;
+        setTimeout(() => { killError = null; }, 3000);
+      }
+    }
   }
 
   // Pop out
@@ -129,14 +163,36 @@
   // Init + polling
   $effect(() => {
     invoke<WindowMode>("get_window_mode")
-      .then((m) => {
-        mode = m;
-      })
+      .then((m) => { mode = m; })
+      .catch(() => {});
+    invoke<boolean>("is_elevated")
+      .then((v) => { isElevated = v; })
       .catch(() => {});
     loadPorts();
 
     const id = setInterval(loadPorts, 2000);
     return () => clearInterval(id);
+  });
+
+  // On focus: sync mode from backend (handles close-while-popped) + clear list focus on blur
+  $effect(() => {
+    function onFocus() {
+      invoke<WindowMode>("get_window_mode")
+        .then((m) => { mode = m; })
+        .catch(() => {});
+    }
+    function onBlur() {
+      const active = document.activeElement as HTMLElement | null;
+      if (active && (active.classList.contains("port-row") || active.closest(".port-row"))) {
+        active.blur();
+      }
+    }
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("blur", onBlur);
+    };
   });
 
   // Keyboard shortcuts
@@ -146,12 +202,74 @@
         if (showSettings) {
           showSettings = false;
         } else if (mode === "menu") {
+          (document.activeElement as HTMLElement | null)?.blur();
           getCurrentWindow().hide().catch(() => {});
         }
         return;
       }
+
       if (e.key === "/" && document.activeElement !== searchEl) {
         e.preventDefault();
+        searchEl?.focus();
+        return;
+      }
+
+      if (e.key.startsWith("Arrow")) {
+        const rows = Array.from(document.querySelectorAll<HTMLElement>(".port-row"));
+        if (!rows.length) return;
+
+        const active = document.activeElement as HTMLElement | null;
+        const activeRow = active?.classList.contains("port-row")
+          ? active
+          : active?.closest<HTMLElement>(".port-row") ?? null;
+        const inList = activeRow != null;
+
+        e.preventDefault();
+
+        if (!inList) {
+          if (e.key === "ArrowDown") rows[0]?.focus();
+          if (e.key === "ArrowUp") rows[rows.length - 1]?.focus();
+          return;
+        }
+
+        const rowIndex = rows.indexOf(activeRow!);
+
+        if (e.key === "ArrowDown") {
+          rows[Math.min(rowIndex + 1, rows.length - 1)]?.focus();
+          return;
+        }
+        if (e.key === "ArrowUp") {
+          rows[Math.max(rowIndex - 1, 0)]?.focus();
+          return;
+        }
+        if (e.key === "ArrowRight") {
+          if (active === activeRow) {
+            activeRow.querySelector<HTMLElement>("button")?.focus();
+          } else {
+            const btns = Array.from(activeRow!.querySelectorAll<HTMLElement>("button"));
+            const i = btns.indexOf(active!);
+            btns[Math.min(i + 1, btns.length - 1)]?.focus();
+          }
+          return;
+        }
+        if (e.key === "ArrowLeft") {
+          if (active !== activeRow) {
+            const btns = Array.from(activeRow!.querySelectorAll<HTMLElement>("button"));
+            const i = btns.indexOf(active!);
+            if (i === 0) activeRow!.focus();
+            else btns[i - 1]?.focus();
+          }
+          return;
+        }
+      }
+
+      if (
+        e.key.length === 1 &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        document.activeElement !== searchEl
+      ) {
         searchEl?.focus();
       }
     }
@@ -161,7 +279,7 @@
   });
 </script>
 
-<div class="app">
+<div class="app" class:elevation-hint={hoveringElevationBanner}>
   <Header
     bind:search
     {mode}
@@ -176,6 +294,7 @@
 
   {#if showSettings}
     <SettingsPanel
+      {isElevated}
       onClose={() => {
         showSettings = false;
       }}
@@ -190,6 +309,23 @@
     <div class="error-bar">{killError}</div>
   {/if}
 
+  {#if killSuccess}
+    <div class="success-bar">{killSuccess}</div>
+  {/if}
+
+  {#if hasElevatedProcesses}
+    <button
+      class="mini-shield-btn"
+      class:hinted={hoveringElevatedRow}
+      onclick={handleRelaunchAsAdmin}
+      onmouseenter={() => (hoveringElevationBanner = true)}
+      onmouseleave={() => (hoveringElevationBanner = false)}
+      title="Some processes need admin — relaunch as admin"
+    >
+      🛡
+    </button>
+  {/if}
+
   <div class="list">
     {#if ports === null}
       <div class="loading">Scanning ports…</div>
@@ -202,7 +338,14 @@
         {#if item.kind === "header"}
           <GroupHeader name={item.name} count={item.count} />
         {:else if item.kind === "row"}
-          <PortRow entry={item.entry} onKill={handleKill} onOpen={handleOpen} />
+          <PortRow
+            entry={item.entry}
+            {isElevated}
+            onKill={handleKill}
+            onOpen={handleOpen}
+            onElevatedHover={() => (hoveringElevatedRow = true)}
+            onElevatedLeave={() => (hoveringElevatedRow = false)}
+          />
         {/if}
       {/each}
     {/if}
@@ -253,5 +396,38 @@
     color: var(--danger);
     font-size: 12px;
     border-bottom: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  }
+
+  .success-bar {
+    padding: 6px 10px;
+    background: color-mix(in srgb, var(--success, #22c55e) 15%, var(--bg));
+    color: var(--success, #22c55e);
+    font-size: 12px;
+    border-bottom: 1px solid color-mix(in srgb, var(--success, #22c55e) 30%, transparent);
+  }
+
+  .mini-shield-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 20px;
+    font-size: 11px;
+    color: var(--warning, #f59e0b);
+    opacity: 0.45;
+    border-bottom: 1px solid color-mix(in srgb, var(--warning, #f59e0b) 15%, transparent);
+    background: color-mix(in srgb, var(--warning, #f59e0b) 5%, var(--bg));
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .mini-shield-btn:hover,
+  .mini-shield-btn.hinted {
+    opacity: 0.8;
+    background: color-mix(in srgb, var(--warning, #f59e0b) 10%, var(--bg));
+  }
+
+  .mini-shield-btn:hover {
+    opacity: 1;
   }
 </style>
