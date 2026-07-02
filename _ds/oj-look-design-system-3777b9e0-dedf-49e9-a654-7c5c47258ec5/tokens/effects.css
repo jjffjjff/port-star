@@ -1,0 +1,13 @@
+:root {
+  /* ── Focus — always amber, never browser blue ── */
+  --db-focus-ring: 2px solid var(--db-accent);
+  --db-focus-offset: 2px;
+  --db-input-glow: 0 0 0 2px rgba(243, 173, 46, 0.2);
+
+  /* ── Depth: NO drop shadows. Use surface ladder + 1px hairline borders. ── */
+  --db-hairline: 1px solid var(--db-border);
+
+  /* ── Motion ── */
+  --db-transition-fast: 0.1s ease;   /* @kind other */
+  --db-transition: 0.15s ease;       /* @kind other */
+}

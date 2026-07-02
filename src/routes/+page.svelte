@@ -1,12 +1,22 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
   import { getCurrentWindow } from "@tauri-apps/api/window";
+  import { flip } from "svelte/animate";
+
+  function slideOut(node: Element, { duration = 180 } = {}) {
+    return {
+      duration,
+      css: (t: number, u: number) =>
+        `opacity:${t};transform:translateX(${u * 72}px);`,
+    };
+  }
   import type { PortEntry, WindowMode } from "$lib/types.js";
   import Header from "$lib/components/Header.svelte";
   import PortRow from "$lib/components/PortRow.svelte";
   import GroupHeader from "$lib/components/GroupHeader.svelte";
   import KillMatchingButton from "$lib/components/KillMatchingButton.svelte";
   import SettingsPanel from "$lib/components/SettingsPanel.svelte";
+  import Icon from "$lib/components/Icon.svelte";
 
   // State
   let ports = $state<PortEntry[] | null>(null);
@@ -14,6 +24,7 @@
   let search = $state("");
   let alwaysOnTop = $state(false);
   let showSettings = $state(false);
+  let relaunching = $state(false);
   let isElevated = $state(false);
   let killError = $state<string | null>(null);
   let killSuccess = $state<string | null>(null);
@@ -82,7 +93,7 @@
     try {
       await invoke("kill_process", { pid });
       await loadPorts();
-      killSuccess = "Process killed";
+      killSuccess = "Process closed";
       setTimeout(() => { killSuccess = null; }, 2000);
     } catch (err) {
       const msg = String(err);
@@ -121,13 +132,15 @@
     }
     await loadPorts();
     if (killed > 0) {
-      killSuccess = `${killed} process${killed === 1 ? "" : "es"} killed`;
+      killSuccess = `${killed} process${killed === 1 ? "" : "es"} closed`;
       setTimeout(() => { killSuccess = null; }, 2000);
     }
   }
 
   // Relaunch as admin (one UAC prompt, then all kills work for the session)
   async function handleRelaunchAsAdmin() {
+    if (relaunching) return;
+    relaunching = true;
     try {
       await invoke("relaunch_as_admin");
     } catch (err) {
@@ -136,6 +149,7 @@
         killError = msg;
         setTimeout(() => { killError = null; }, 3000);
       }
+      relaunching = false;
     }
   }
 
@@ -306,11 +320,11 @@
   {/if}
 
   {#if killError}
-    <div class="error-bar">{killError}</div>
+    <div class="error-bar"><Icon name="x-circle" size={15} /><span>{killError}</span></div>
   {/if}
 
   {#if killSuccess}
-    <div class="success-bar">{killSuccess}</div>
+    <div class="success-bar"><Icon name="check-circle" size={15} /><span>{killSuccess}</span></div>
   {/if}
 
   {#if hasElevatedProcesses}
@@ -318,11 +332,13 @@
       class="mini-shield-btn"
       class:hinted={hoveringElevatedRow}
       onclick={handleRelaunchAsAdmin}
+      disabled={relaunching}
       onmouseenter={() => (hoveringElevationBanner = true)}
       onmouseleave={() => (hoveringElevationBanner = false)}
-      title="Some processes need admin — relaunch as admin"
+      title={relaunching ? "Relaunching…" : "Some processes need admin - click to relaunch"}
     >
-      🛡
+      <Icon name="shield-warning" size={14} />
+      <span>Relaunch as admin to close protected ports</span>
     </button>
   {/if}
 
@@ -331,22 +347,25 @@
       <div class="loading">Scanning ports…</div>
     {:else if filtered.length === 0}
       <div class="empty">
-        {search ? "No matches" : "No listening ports found"}
+        <span class="empty-title">{search ? "No matches" : "No listening ports found"}</span>
+        <span class="empty-sub">{search ? "nothing here by that name" : "nothing bound right now"}</span>
       </div>
     {:else}
-      {#each renderItems as item}
-        {#if item.kind === "header"}
-          <GroupHeader name={item.name} count={item.count} />
-        {:else if item.kind === "row"}
-          <PortRow
-            entry={item.entry}
-            {isElevated}
-            onKill={handleKill}
-            onOpen={handleOpen}
-            onElevatedHover={() => (hoveringElevatedRow = true)}
-            onElevatedLeave={() => (hoveringElevatedRow = false)}
-          />
-        {/if}
+      {#each renderItems as item (item.kind === "row" ? `row-${item.entry.pid}-${item.entry.port}` : `header-${item.name}`)}
+        <div out:slideOut={{ duration: 180 }} animate:flip={{ duration: 180 }}>
+          {#if item.kind === "header"}
+            <GroupHeader name={item.name} count={item.count} />
+          {:else if item.kind === "row"}
+            <PortRow
+              entry={item.entry}
+              {isElevated}
+              onKill={handleKill}
+              onOpen={handleOpen}
+              onElevatedHover={() => (hoveringElevatedRow = true)}
+              onElevatedLeave={() => (hoveringElevatedRow = false)}
+            />
+          {/if}
+        </div>
       {/each}
     {/if}
   </div>
@@ -383,48 +402,65 @@
   .loading,
   .empty {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 80px;
+    gap: 6px;
+    height: 120px;
     color: var(--fg-muted);
     font-size: 13px;
   }
 
+  .empty-sub {
+    font-family: var(--font-editorial);
+    font-style: italic;
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
   .error-bar {
-    padding: 6px 10px;
-    background: color-mix(in srgb, var(--danger) 15%, var(--bg));
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--danger) 14%, var(--bg));
     color: var(--danger);
     font-size: 12px;
     border-bottom: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
   }
 
   .success-bar {
-    padding: 6px 10px;
-    background: color-mix(in srgb, var(--success, #22c55e) 15%, var(--bg));
-    color: var(--success, #22c55e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--success) 13%, var(--bg));
+    color: var(--success);
     font-size: 12px;
-    border-bottom: 1px solid color-mix(in srgb, var(--success, #22c55e) 30%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
   }
 
   .mini-shield-btn {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 7px;
     width: 100%;
-    height: 20px;
-    font-size: 11px;
-    color: var(--warning, #f59e0b);
-    opacity: 0.45;
-    border-bottom: 1px solid color-mix(in srgb, var(--warning, #f59e0b) 15%, transparent);
-    background: color-mix(in srgb, var(--warning, #f59e0b) 5%, var(--bg));
+    height: 28px;
+    font-size: 11.5px;
+    color: var(--warning);
+    opacity: 0.7;
+    border-bottom: 1px solid color-mix(in srgb, var(--warning) 18%, transparent);
+    background: color-mix(in srgb, var(--warning) 7%, var(--bg));
     cursor: pointer;
-    transition: opacity 0.15s;
+    transition: opacity 0.15s, background 0.15s;
   }
 
   .mini-shield-btn:hover,
   .mini-shield-btn.hinted {
-    opacity: 0.8;
-    background: color-mix(in srgb, var(--warning, #f59e0b) 10%, var(--bg));
+    opacity: 0.9;
+    background: color-mix(in srgb, var(--warning) 12%, var(--bg));
   }
 
   .mini-shield-btn:hover {

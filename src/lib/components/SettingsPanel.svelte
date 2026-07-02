@@ -1,5 +1,7 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
+  import { slide } from "svelte/transition";
+  import Icon from "$lib/components/Icon.svelte";
 
   let { onClose, isElevated }: { onClose: () => void; isElevated: boolean } = $props();
 
@@ -41,10 +43,10 @@
   }
 </script>
 
-<div class="settings">
+<div class="settings" transition:slide={{ duration: 180, axis: 'y' }}>
   <div class="settings-header">
     <span class="title">Settings</span>
-    <button class="close-btn" onclick={onClose} aria-label="Close settings">✕</button>
+    <button class="close-btn" onclick={onClose} aria-label="Close settings"><Icon name="x" size={13} /></button>
   </div>
 
   <div class="setting-row">
@@ -71,7 +73,7 @@
       <span class="loading">…</span>
     {:else}
       <div class="toggle-wrap" title={!isElevated ? "Relaunch as admin to enable" : undefined}>
-        {#if !isElevated}<span class="lock">🔒</span>{/if}
+        {#if !isElevated}<span class="lock"><Icon name="lock-simple" size={12} /></span>{/if}
         <button
           id="autostart-elevated-toggle"
           class="toggle"
@@ -103,30 +105,32 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 8px 6px;
+    padding: 8px 10px 6px;
     border-bottom: 1px solid var(--border);
   }
 
   .title {
-    font-size: 12px;
-    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
     color: var(--fg-muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
   }
 
   .close-btn {
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 3px;
-    font-size: 11px;
+    border-radius: var(--radius-input);
+    color: var(--fg-muted);
   }
 
   .close-btn:hover {
     background: var(--border);
+    color: var(--fg);
   }
 
   .setting-row {
@@ -149,15 +153,16 @@
   }
 
   .toggle {
-    font-size: 11px;
-    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
     color: var(--fg-muted);
-    padding: 2px 8px;
-    border-radius: 10px;
+    padding: 3px 9px;
+    border-radius: var(--radius-input);
     border: 1px solid var(--border);
     background: var(--bg);
     cursor: pointer;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     transition: all 0.15s;
   }
 
@@ -177,8 +182,9 @@
   }
 
   .lock {
-    font-size: 10px;
-    opacity: 0.5;
+    display: flex;
+    color: var(--fg-muted);
+    opacity: 0.6;
   }
 
   .muted label {
@@ -186,18 +192,20 @@
   }
 
   .toggle.on {
-    color: var(--accent);
+    color: var(--accent-bright);
     border-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 12%, var(--bg));
+    background: color-mix(in srgb, var(--accent) 16%, var(--bg));
   }
 
   .quit-btn {
-    font-size: 11px;
-    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
     color: var(--danger);
-    padding: 2px 10px;
-    border-radius: 10px;
-    border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
+    padding: 3px 11px;
+    border-radius: var(--radius-button);
+    letter-spacing: 0.06em;
+    border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
     background: transparent;
     cursor: pointer;
     letter-spacing: 0.05em;
@@ -205,7 +213,9 @@
   }
 
   .quit-btn:hover {
-    background: color-mix(in srgb, var(--danger) 12%, var(--bg));
+    background: color-mix(in srgb, var(--danger) 14%, var(--bg));
     border-color: var(--danger);
   }
+
+  /* the extra letter-spacing on .quit-btn was doubled by the mono role; keep terse */
 </style>

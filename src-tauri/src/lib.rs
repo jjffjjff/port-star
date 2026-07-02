@@ -494,6 +494,7 @@ fn dock_back(app: AppHandle, state: State<AppState>) -> Result<(), String> {
     win.set_resizable(false).map_err(|e| e.to_string())?;
     win.set_skip_taskbar(true).map_err(|e| e.to_string())?;
     win.set_always_on_top(false).map_err(|e| e.to_string())?;
+    win.set_size(tauri::PhysicalSize::new(380u32, 520u32)).map_err(|e| e.to_string())?;
     win.hide().map_err(|e| e.to_string())?;
     Ok(())
 }
@@ -545,10 +546,19 @@ fn show_menu_window(app: &AppHandle, position: tauri::PhysicalPosition<f64>) {
         return;
     };
 
-    let size = win.outer_size().unwrap_or(tauri::PhysicalSize {
-        width: 380,
-        height: 520,
-    });
+    // If currently popped out, dock back to menu mode first
+    if let Some(state) = app.try_state::<AppState>() {
+        if matches!(*state.mode.lock().unwrap(), WindowMode::Popped) {
+            *state.mode.lock().unwrap() = WindowMode::Menu;
+            let _ = win.set_decorations(false);
+            let _ = win.set_resizable(false);
+            let _ = win.set_skip_taskbar(true);
+            let _ = win.set_always_on_top(false);
+            let _ = win.set_size(tauri::PhysicalSize::new(380u32, 520u32));
+        }
+    }
+
+    let size = tauri::PhysicalSize { width: 380u32, height: 520u32 };
 
     let (wa_left, wa_top, wa_right, wa_bottom) = work_area();
     let w = size.width as i32;
@@ -564,7 +574,7 @@ fn show_menu_window(app: &AppHandle, position: tauri::PhysicalPosition<f64>) {
 
 const TRAY_SVG: &str = r##"<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="white" d="M12 2.25a2.75 2.75 0 0 0-.75 5.396v12.57a8.25 8.25 0 0 1-7.466-7.466H5a.75.75 0 0 0 0-1.5H3a.75.75 0 0 0-.75.75c0 5.385 4.365 9.75 9.75 9.75s9.75-4.365 9.75-9.75a.75.75 0 0 0-.75-.75h-2a.75.75 0 0 0 0 1.5h1.216a8.25 8.25 0 0 1-7.466 7.466V7.646A2.751 2.751 0 0 0 12 2.25"/></svg>"##;
 
-const WINDOW_SVG: &str = r##"<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#7c6af7" d="M12 2.25a2.75 2.75 0 0 0-.75 5.396v12.57a8.25 8.25 0 0 1-7.466-7.466H5a.75.75 0 0 0 0-1.5H3a.75.75 0 0 0-.75.75c0 5.385 4.365 9.75 9.75 9.75s9.75-4.365 9.75-9.75a.75.75 0 0 0-.75-.75h-2a.75.75 0 0 0 0 1.5h1.216a8.25 8.25 0 0 1-7.466 7.466V7.646A2.751 2.751 0 0 0 12 2.25"/></svg>"##;
+const WINDOW_SVG: &str = r##"<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#18181b"/><path fill="white" d="M12 2.25a2.75 2.75 0 0 0-.75 5.396v12.57a8.25 8.25 0 0 1-7.466-7.466H5a.75.75 0 0 0 0-1.5H3a.75.75 0 0 0-.75.75c0 5.385 4.365 9.75 9.75 9.75s9.75-4.365 9.75-9.75a.75.75 0 0 0-.75-.75h-2a.75.75 0 0 0 0 1.5h1.216a8.25 8.25 0 0 1-7.466 7.466V7.646A2.751 2.751 0 0 0 12 2.25"/></svg>"##;
 
 fn rasterize_svg(svg: &str, size: u32) -> tauri::image::Image<'static> {
     let opt = resvg::usvg::Options::default();
@@ -652,6 +662,7 @@ pub fn run() {
                     let _ = window.set_resizable(false);
                     let _ = window.set_skip_taskbar(true);
                     let _ = window.set_always_on_top(false);
+                    let _ = window.set_size(tauri::PhysicalSize::new(380u32, 520u32));
                     let _ = window.hide();
                 }
                 _ => {}

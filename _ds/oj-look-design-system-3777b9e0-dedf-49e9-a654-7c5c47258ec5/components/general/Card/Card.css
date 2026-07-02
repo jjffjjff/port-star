@@ -1,0 +1,19 @@
+.db-card {
+  font-family: var(--db-font-structure);
+  color: var(--db-text-primary);
+}
+
+.db-card--standard {
+  background: var(--db-surface);
+  border: 1px solid var(--db-border);
+  border-radius: var(--db-radius-card);
+  padding: 20px;
+}
+
+.db-card--globe-panel {
+  background: var(--db-canvas);
+  border: none;
+  border-radius: var(--db-radius-none);
+  padding: 0;
+  width: 100%;
+}

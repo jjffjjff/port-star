@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PortEntry } from "$lib/types.js";
+  import Icon from "$lib/components/Icon.svelte";
 
   let {
     entry,
@@ -35,15 +36,15 @@
 >
   <div class="icon">
     {#if entry.icon_b64}
-      <img src="data:image/png;base64,{entry.icon_b64}" alt="" width="16" height="16" />
+      <img src="data:image/png;base64,{entry.icon_b64}" alt="" width="18" height="18" />
     {:else}
-      <span class="icon-fallback">⬡</span>
+      <span class="icon-fallback"><Icon name="hexagon" size={17} /></span>
     {/if}
   </div>
   <span class="port">:{entry.port}</span>
   <span class="name" title={entry.exe_path ?? entry.process_name}>{entry.process_name}</span>
   {#if entry.needs_elevation}
-    <span class="shield" title="Needs admin to kill">🛡</span>
+    <span class="shield" title="Needs admin to kill"><Icon name="shield-warning" size={15} /></span>
   {/if}
   <div class="btns">
     <button
@@ -52,16 +53,16 @@
       title="Open in browser"
       aria-label="Open port {entry.port} in browser"
     >
-      🌐
+      <Icon name="arrow-square-out" size={15} />
     </button>
     <button
       class="btn-kill"
       onclick={() => onKill(entry.pid)}
       disabled={killBlocked}
-      title={killBlocked ? "Needs admin — relaunch as admin to kill" : "Kill process"}
-      aria-label="Kill {entry.process_name}"
+      title={killBlocked ? "Needs admin — relaunch as admin to close" : "Close process"}
+      aria-label="Close {entry.process_name}"
     >
-      ✕
+      <Icon name="x" size={14} />
     </button>
   </div>
 </div>
@@ -71,8 +72,8 @@
     display: flex;
     align-items: center;
     height: var(--row-height);
-    padding: 0 8px;
-    gap: 8px;
+    padding: 0 12px;
+    gap: 11px;
     border-bottom: 1px solid var(--border);
   }
 
@@ -92,25 +93,26 @@
   }
 
   .icon {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    color: var(--fg-muted);
   }
 
   .icon-fallback {
-    font-size: 12px;
+    display: flex;
     color: var(--fg-muted);
   }
 
   .port {
-    font-size: 12px;
-    font-family: "Cascadia Code", "Consolas", monospace;
-    color: var(--accent);
+    font-size: 12.5px;
+    font-family: var(--font-mono);
+    color: var(--accent-bright);
     flex-shrink: 0;
-    min-width: 52px;
+    min-width: 56px;
   }
 
   .name {
@@ -122,27 +124,28 @@
   }
 
   .shield {
-    font-size: 11px;
+    display: flex;
+    color: var(--warning);
     opacity: 0;
     flex-shrink: 0;
-    transition: opacity 0.1s;
+    transition: opacity 0.15s;
   }
 
   .row:hover .shield,
   .row:focus .shield,
   .row:focus-within .shield {
-    opacity: 0.5;
+    opacity: 0.7;
   }
 
   :global(.elevation-hint) .shield {
-    opacity: 0.5;
+    opacity: 0.7;
   }
 
   .btns {
     display: flex;
     gap: 2px;
     opacity: 0;
-    transition: opacity 0.1s;
+    transition: opacity 0.15s;
   }
 
   .row:hover .btns {
@@ -150,26 +153,27 @@
   }
 
   button {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 3px;
-    font-size: 12px;
+    border-radius: var(--radius-input);
+    color: var(--fg-muted);
   }
 
   button:hover {
-    background: var(--bg-elevated);
+    background: var(--bg);
+    color: var(--fg);
   }
 
   .btn-kill:hover {
     color: var(--danger);
-    background: color-mix(in srgb, var(--danger) 15%, transparent);
+    background: color-mix(in srgb, var(--danger) 16%, transparent);
   }
 
   .btn-kill:disabled {
-    opacity: 0.25;
+    opacity: 0.3;
   }
 
   .btn-kill:disabled:hover {

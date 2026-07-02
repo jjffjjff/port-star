@@ -1,0 +1,311 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": [
+          {
+            "element": "button",
+            "message": "Use <Button> from the design system instead of <button>."
+          },
+          {
+            "element": "input",
+            "message": "Use <Input> from the design system instead of <input>."
+          },
+          {
+            "element": "textarea",
+            "message": "Use <Input> from the design system instead of <textarea>."
+          },
+          {
+            "element": "p",
+            "message": "Use <Typography> from the design system instead of <p>."
+          },
+          {
+            "element": "h1",
+            "message": "Use <Typography> from the design system instead of <h1>."
+          },
+          {
+            "element": "h2",
+            "message": "Use <Typography> from the design system instead of <h2>."
+          },
+          {
+            "element": "span",
+            "message": "Use <Typography> from the design system instead of <span>."
+          }
+        ]
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/general/Alert/**",
+              "components/general/Badge/**",
+              "components/general/Button/**",
+              "components/general/Card/**",
+              "components/general/Container/**",
+              "components/general/Input/**",
+              "components/general/Sidebar/**",
+              "components/general/TopBar/**",
+              "components/general/Typography/**",
+              "ui_kits/meridian/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Inter|Instrument Serif|DM Mono|JetBrains Mono|Montserrat|Space Grotesk))/i]",
+        "message": "Font not provided by the design system. Available: Inter, Instrument Serif, DM Mono, JetBrains Mono, Montserrat, Space Grotesk."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Alert'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|children|className|key|ref|className|style|children)$/]",
+        "message": "<Alert> doesn't accept that prop. Declared props: variant, children, className."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|children|className|key|ref|className|style|children)$/]",
+        "message": "<Badge> doesn't accept that prop. Declared props: variant, children, className."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|children|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Card'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|padding|children|className|key|ref|className|style|children)$/]",
+        "message": "<Card> doesn't accept that prop. Declared props: variant, padding, children, className."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Container'] > JSXAttribute > JSXIdentifier[name!=/^(?:maxWidth|children|className|key|ref|className|style|children)$/]",
+        "message": "<Container> doesn't accept that prop. Declared props: maxWidth, children, className."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Input'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|error|multiline|rows|key|ref|className|style|children)$/]",
+        "message": "<Input> doesn't accept that prop. Declared props: label, error, multiline, rows."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SidebarChildItem'] > JSXAttribute > JSXIdentifier[name!=/^(?:key|label|onClick|key|ref|className|style|children)$/]",
+        "message": "<SidebarChildItem> doesn't accept that prop. Declared props: key, label, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='NavItem'] > JSXAttribute > JSXIdentifier[name!=/^(?:key|label|onClick|key|ref|className|style|children)$/]",
+        "message": "<NavItem> doesn't accept that prop. Declared props: key, label, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Typography'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|as|secondary|children|className|key|ref|className|style|children)$/]",
+        "message": "<Typography> doesn't accept that prop. Declared props: variant, as, secondary, children, className."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Alert": {
+        "replaces": []
+      },
+      "Badge": {
+        "replaces": []
+      },
+      "Button": {
+        "replaces": [
+          "button"
+        ]
+      },
+      "Card": {
+        "replaces": []
+      },
+      "Container": {
+        "replaces": []
+      },
+      "Input": {
+        "replaces": [
+          "input",
+          "textarea"
+        ]
+      },
+      "SidebarChildItem": {
+        "replaces": []
+      },
+      "NavItem": {
+        "replaces": []
+      },
+      "Typography": {
+        "replaces": [
+          "p",
+          "h1",
+          "h2",
+          "span"
+        ]
+      }
+    },
+    "tokens": [
+      "--border-hairline",
+      "--db-accent",
+      "--db-accent-hover",
+      "--db-body-lh",
+      "--db-body-size",
+      "--db-body-weight",
+      "--db-border",
+      "--db-canvas",
+      "--db-caption-lh",
+      "--db-caption-size",
+      "--db-caption-tracking",
+      "--db-caption-weight",
+      "--db-container-max",
+      "--db-display-lh",
+      "--db-display-size",
+      "--db-display-tracking",
+      "--db-display-weight",
+      "--db-error",
+      "--db-focus-offset",
+      "--db-focus-ring",
+      "--db-font-display",
+      "--db-font-editorial",
+      "--db-font-mono",
+      "--db-font-mono-alt",
+      "--db-font-structure",
+      "--db-h1-lh",
+      "--db-h1-size",
+      "--db-h1-tracking",
+      "--db-h1-weight",
+      "--db-h2-lh",
+      "--db-h2-size",
+      "--db-h2-tracking",
+      "--db-h2-weight",
+      "--db-hairline",
+      "--db-info",
+      "--db-input-glow",
+      "--db-radius-button",
+      "--db-radius-card",
+      "--db-radius-input",
+      "--db-radius-none",
+      "--db-small-lh",
+      "--db-small-size",
+      "--db-small-weight",
+      "--db-space-lg",
+      "--db-space-md",
+      "--db-space-section",
+      "--db-space-sm",
+      "--db-space-xl",
+      "--db-space-xs",
+      "--db-success",
+      "--db-surface",
+      "--db-surface-raised",
+      "--db-text-primary",
+      "--db-text-secondary",
+      "--db-transition",
+      "--db-transition-fast",
+      "--db-warning",
+      "--surface-card",
+      "--surface-input",
+      "--surface-page",
+      "--text-body",
+      "--text-muted",
+      "--tweaks-card-gap",
+      "--tweaks-gap",
+      "--tweaks-main-padding",
+      "--tweaks-typo-scale"
+    ],
+    "tokenKinds": {
+      "--db-canvas": "color",
+      "--db-surface": "color",
+      "--db-surface-raised": "color",
+      "--db-border": "color",
+      "--db-text-primary": "font",
+      "--db-text-secondary": "font",
+      "--db-accent": "color",
+      "--db-accent-hover": "color",
+      "--db-error": "color",
+      "--db-warning": "color",
+      "--db-success": "color",
+      "--db-info": "color",
+      "--text-body": "font",
+      "--text-muted": "font",
+      "--surface-page": "color",
+      "--surface-card": "color",
+      "--surface-input": "color",
+      "--border-hairline": "color",
+      "--db-font-structure": "font",
+      "--db-font-display": "font",
+      "--db-font-editorial": "font",
+      "--db-font-mono": "font",
+      "--db-font-mono-alt": "font",
+      "--db-display-size": "spacing",
+      "--db-display-weight": "font",
+      "--db-display-tracking": "font",
+      "--db-h1-size": "spacing",
+      "--db-h1-weight": "font",
+      "--db-h1-tracking": "font",
+      "--db-h2-size": "spacing",
+      "--db-h2-weight": "font",
+      "--db-h2-tracking": "font",
+      "--db-body-size": "spacing",
+      "--db-body-weight": "font",
+      "--db-small-size": "spacing",
+      "--db-small-weight": "font",
+      "--db-caption-size": "spacing",
+      "--db-caption-weight": "font",
+      "--db-caption-tracking": "font",
+      "--db-display-lh": "other",
+      "--db-h1-lh": "other",
+      "--db-h2-lh": "other",
+      "--db-body-lh": "other",
+      "--db-small-lh": "other",
+      "--db-caption-lh": "other",
+      "--db-space-xs": "spacing",
+      "--db-space-sm": "spacing",
+      "--db-space-md": "spacing",
+      "--db-space-lg": "spacing",
+      "--db-space-xl": "spacing",
+      "--db-space-section": "spacing",
+      "--db-container-max": "spacing",
+      "--db-radius-input": "radius",
+      "--db-radius-button": "radius",
+      "--db-radius-card": "radius",
+      "--db-radius-none": "radius",
+      "--db-focus-ring": "color",
+      "--db-focus-offset": "spacing",
+      "--db-input-glow": "shadow",
+      "--db-hairline": "color",
+      "--db-transition-fast": "other",
+      "--db-transition": "other",
+      "--tweaks-gap": "spacing",
+      "--tweaks-card-gap": "spacing",
+      "--tweaks-main-padding": "spacing",
+      "--tweaks-typo-scale": "other"
+    },
+    "fontFamilies": [
+      "DM Mono",
+      "Instrument Serif",
+      "Inter",
+      "JetBrains Mono",
+      "Montserrat",
+      "Space Grotesk"
+    ]
+  }
+}

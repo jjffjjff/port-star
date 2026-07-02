@@ -1,0 +1,12 @@
+:root {
+  /* ── Spacing — 4px grid ── */
+  --db-space-xs: 4px;        /* tight elements */
+  --db-space-sm: 8px;        /* related items */
+  --db-space-md: 16px;       /* element padding */
+  --db-space-lg: 24px;       /* component spacing */
+  --db-space-xl: 32px;       /* screen padding */
+  --db-space-section: 96px;  /* generous rhythm between sections */
+
+  /* ── Layout ── */
+  --db-container-max: 1200px;
+}

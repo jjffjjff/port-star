@@ -1,0 +1,54 @@
+.db-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--db-space-xs);
+}
+
+.db-input-label {
+  font-family: var(--db-font-structure);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--db-text-secondary);
+}
+
+.db-input {
+  font-family: var(--db-font-structure);
+  font-size: 16px;
+  color: var(--db-text-primary);
+  background: var(--db-surface-raised);
+  border: 1px solid var(--db-border);
+  border-radius: var(--db-radius-input);
+  padding: var(--db-space-sm) var(--db-space-md);
+  height: 40px;
+  outline: none;
+  transition: border-color var(--db-transition);
+}
+
+.db-input--textarea {
+  height: auto;
+  resize: vertical;
+}
+
+.db-input:focus {
+  outline: var(--db-focus-ring);
+  outline-offset: var(--db-focus-offset);
+}
+
+.db-input::placeholder {
+  color: var(--db-text-secondary);
+  opacity: 0.6;
+}
+
+.db-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.db-input-wrapper--error .db-input {
+  border-color: var(--db-error);
+}
+
+.db-input-error {
+  font-size: 14px;
+  color: var(--db-error);
+}

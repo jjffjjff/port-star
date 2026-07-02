@@ -4,30 +4,31 @@
 
 <div class="group-header">
   <span class="group-name">{name}</span>
-  <span class="group-count">({count})</span>
+  <span class="group-count">{count}</span>
 </div>
 
 <style>
   .group-header {
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding: 4px 8px 2px;
+    gap: 6px;
+    padding: 8px 12px 3px;
     background: var(--bg);
-    border-bottom: 1px solid var(--border);
   }
 
   .group-name {
-    font-size: 11px;
-    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
     color: var(--fg-muted);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.09em;
   }
 
   .group-count {
-    font-size: 11px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
     color: var(--fg-muted);
-    opacity: 0.7;
+    opacity: 0.6;
   }
 </style>

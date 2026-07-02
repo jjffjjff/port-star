@@ -1,0 +1,25 @@
+.db-alert {
+  font-family: var(--db-font-structure);
+  font-size: 16px;
+  color: var(--db-text-primary);
+  background: var(--db-surface);
+  border-left: 3px solid var(--db-accent);
+  border-radius: var(--db-radius-input);
+  padding: var(--db-space-md);
+}
+
+.db-alert--info {
+  border-left-color: var(--db-info);
+}
+
+.db-alert--error {
+  border-left-color: var(--db-error);
+}
+
+.db-alert--warning {
+  border-left-color: var(--db-warning);
+}
+
+.db-alert--success {
+  border-left-color: var(--db-success);
+}
