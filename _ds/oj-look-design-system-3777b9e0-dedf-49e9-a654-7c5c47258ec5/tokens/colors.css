@@ -1,0 +1,29 @@
+:root {
+  /* ── Surface ladder — Warm Forest Green ── */
+  --db-canvas: #0f1a15;          /* Page background — deep forest */
+  --db-surface: #162820;         /* Cards, panels, sidebars */
+  --db-surface-raised: #1d3329;  /* Inputs, active states */
+  --db-border: #2a4435;          /* Hairline borders (1px) — depth without shadows */
+
+  /* ── Text ── */
+  --db-text-primary: #e8f0eb;    /* Main text — warm off-white */
+  --db-text-secondary: #8a9e94;  /* Secondary text, labels */
+
+  /* ── Accent — Deep Forest Green (strategic, 3 uses only: CTA fill, focus ring, active nav) ── */
+  --db-accent: #16844a;
+  --db-accent-hover: #1f9d57;
+
+  /* ── Semantic (rarely used) ── */
+  --db-error: #F87171;
+  --db-warning: #FBBF24;
+  --db-success: #34D399;
+  --db-info: #60A5FA;
+
+  /* ── Semantic aliases (map roles onto the ladder) ── */
+  --text-body: var(--db-text-primary);
+  --text-muted: var(--db-text-secondary);
+  --surface-page: var(--db-canvas);
+  --surface-card: var(--db-surface);
+  --surface-input: var(--db-surface-raised);
+  --border-hairline: var(--db-border);
+}

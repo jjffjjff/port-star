@@ -1,18 +1,47 @@
-:root {
-  --bg: #1a1a1f;
-  --bg-elevated: #24242b;
-  --fg: #e8e8ec;
-  --fg-muted: #888896;
-  --accent: #8b5cf6;
-  --danger: #ef4444;
-  --border: #2e2e38;
-  --row-height: 36px;
+/* oj-look — warm-dark (forest-green) design language.
+   Webfonts load from Google Fonts when online; the fallbacks
+   (Segoe UI / Cascadia Code / Georgia) keep the app coherent offline. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap");
 
-  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+:root {
+  /* ── Surface ladder ── */
+  --canvas: #0f1a15;
+  --bg: #162820;            /* popover / panel surface */
+  --bg-elevated: #1d3329;   /* inputs, hover, active */
+  --border: #2a4435;        /* 1px hairline — depth without shadows */
+
+  /* ── Text ── */
+  --fg: #e8f0eb;
+  --fg-muted: #8a9e94;
+
+  /* ── Accent — deep forest green (strategic: focus, active, CTA) ── */
+  --accent: #16844a;
+  --accent-hover: #1f9d57;
+  --accent-bright: #43b06f; /* legible green for port numbers / focused text */
+
+  /* ── Semantic ── */
+  --danger: #f87171;
+  --success: #34d399;
+  --warning: #fbbf24;
+
+  /* ── Type roles ── */
+  --font-ui: "Inter", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", "Consolas", ui-monospace, monospace;
+  --font-editorial: "Instrument Serif", Georgia, "Times New Roman", serif;
+
+  /* ── Radii — tight, never pills ── */
+  --radius-input: 4px;
+  --radius-button: 6px;
+  --radius-card: 8px;
+
+  --row-height: 40px;
+
+  font-family: var(--font-ui);
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--fg);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
@@ -37,11 +66,22 @@ button {
   font-size: 13px;
   font-family: inherit;
   line-height: 1;
-  transition: color 0.1s;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
 
 button:hover {
   color: var(--fg);
+}
+
+/* oj-look press micro-interaction — no bounce */
+button:active {
+  transform: scale(0.97);
+}
+
+/* oj-look focus — forest green, never browser blue */
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 input[type="text"],
@@ -52,10 +92,17 @@ input[type="search"] {
   font-family: inherit;
   font-size: 13px;
   outline: none;
-  transition: border-color 0.15s;
+  border-radius: var(--radius-input);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="text"]::placeholder,
+input[type="search"]::placeholder {
+  color: var(--fg-muted);
 }
 
 input[type="text"]:focus,
 input[type="search"]:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(22, 132, 74, 0.22);
 }

@@ -1,0 +1,57 @@
+.db-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 var(--db-space-lg);
+  background: var(--db-surface);
+  border-bottom: 1px solid var(--db-border);
+  font-family: var(--db-font-structure);
+}
+
+.db-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: var(--db-space-lg);
+}
+
+.db-topbar__logo {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--db-text-primary);
+}
+
+.db-topbar__nav {
+  display: flex;
+  gap: var(--db-space-xs);
+}
+
+.db-topbar__item {
+  font-family: var(--db-font-structure);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--db-text-secondary);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  padding: 6px 12px;
+  height: auto;
+  cursor: pointer;
+  transition: color var(--db-transition), border-color var(--db-transition);
+}
+
+.db-topbar__item:hover {
+  color: var(--db-text-primary);
+  border-color: var(--db-text-secondary);
+}
+
+.db-topbar__item--active {
+  color: var(--db-text-primary);
+  border-color: var(--db-accent);
+}
+
+.db-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--db-space-sm);
+}
