@@ -10,7 +10,7 @@
   } = $props();
 
   function handleClick() {
-    if (window.confirm(`Kill ${count} matching process${count === 1 ? "" : "es"}?`)) {
+    if (window.confirm(`Close ${count} matching process${count === 1 ? "" : "es"}?`)) {
       onConfirm();
     }
   }
@@ -20,7 +20,7 @@
   <div class="kill-bar">
     <button class="kill-all" onclick={handleClick}>
       <Icon name="x-circle" size={14} />
-      Kill {count} matching
+      Close {count} matching
     </button>
   </div>
 {/if}

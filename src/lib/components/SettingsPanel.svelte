@@ -1,5 +1,6 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
+  import { slide } from "svelte/transition";
   import Icon from "$lib/components/Icon.svelte";
 
   let { onClose, isElevated }: { onClose: () => void; isElevated: boolean } = $props();
@@ -42,7 +43,7 @@
   }
 </script>
 
-<div class="settings">
+<div class="settings" transition:slide={{ duration: 180, axis: 'y' }}>
   <div class="settings-header">
     <span class="title">Settings</span>
     <button class="close-btn" onclick={onClose} aria-label="Close settings"><Icon name="x" size={13} /></button>
@@ -104,7 +105,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 8px 6px;
+    padding: 8px 10px 6px;
     border-bottom: 1px solid var(--border);
   }
 
@@ -118,8 +119,8 @@
   }
 
   .close-btn {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -1,6 +1,15 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
   import { getCurrentWindow } from "@tauri-apps/api/window";
+  import { flip } from "svelte/animate";
+
+  function slideOut(node: Element, { duration = 180 } = {}) {
+    return {
+      duration,
+      css: (t: number, u: number) =>
+        `opacity:${t};transform:translateX(${u * 72}px);`,
+    };
+  }
   import type { PortEntry, WindowMode } from "$lib/types.js";
   import Header from "$lib/components/Header.svelte";
   import PortRow from "$lib/components/PortRow.svelte";
@@ -15,6 +24,7 @@
   let search = $state("");
   let alwaysOnTop = $state(false);
   let showSettings = $state(false);
+  let relaunching = $state(false);
   let isElevated = $state(false);
   let killError = $state<string | null>(null);
   let killSuccess = $state<string | null>(null);
@@ -83,7 +93,7 @@
     try {
       await invoke("kill_process", { pid });
       await loadPorts();
-      killSuccess = "Process killed";
+      killSuccess = "Process closed";
       setTimeout(() => { killSuccess = null; }, 2000);
     } catch (err) {
       const msg = String(err);
@@ -122,13 +132,15 @@
     }
     await loadPorts();
     if (killed > 0) {
-      killSuccess = `${killed} process${killed === 1 ? "" : "es"} killed`;
+      killSuccess = `${killed} process${killed === 1 ? "" : "es"} closed`;
       setTimeout(() => { killSuccess = null; }, 2000);
     }
   }
 
   // Relaunch as admin (one UAC prompt, then all kills work for the session)
   async function handleRelaunchAsAdmin() {
+    if (relaunching) return;
+    relaunching = true;
     try {
       await invoke("relaunch_as_admin");
     } catch (err) {
@@ -137,6 +149,7 @@
         killError = msg;
         setTimeout(() => { killError = null; }, 3000);
       }
+      relaunching = false;
     }
   }
 
@@ -319,12 +332,13 @@
       class="mini-shield-btn"
       class:hinted={hoveringElevatedRow}
       onclick={handleRelaunchAsAdmin}
+      disabled={relaunching}
       onmouseenter={() => (hoveringElevationBanner = true)}
       onmouseleave={() => (hoveringElevationBanner = false)}
-      title="Some processes need admin — relaunch as admin"
+      title={relaunching ? "Relaunching…" : "Some processes need admin - click to relaunch"}
     >
       <Icon name="shield-warning" size={14} />
-      <span>Relaunch as admin to kill protected ports</span>
+      <span>Relaunch as admin to close protected ports</span>
     </button>
   {/if}
 
@@ -337,19 +351,21 @@
         <span class="empty-sub">{search ? "nothing here by that name" : "nothing bound right now"}</span>
       </div>
     {:else}
-      {#each renderItems as item}
-        {#if item.kind === "header"}
-          <GroupHeader name={item.name} count={item.count} />
-        {:else if item.kind === "row"}
-          <PortRow
-            entry={item.entry}
-            {isElevated}
-            onKill={handleKill}
-            onOpen={handleOpen}
-            onElevatedHover={() => (hoveringElevatedRow = true)}
-            onElevatedLeave={() => (hoveringElevatedRow = false)}
-          />
-        {/if}
+      {#each renderItems as item (item.kind === "row" ? `row-${item.entry.pid}-${item.entry.port}` : `header-${item.name}`)}
+        <div out:slideOut={{ duration: 180 }} animate:flip={{ duration: 180 }}>
+          {#if item.kind === "header"}
+            <GroupHeader name={item.name} count={item.count} />
+          {:else if item.kind === "row"}
+            <PortRow
+              entry={item.entry}
+              {isElevated}
+              onKill={handleKill}
+              onOpen={handleOpen}
+              onElevatedHover={() => (hoveringElevatedRow = true)}
+              onElevatedLeave={() => (hoveringElevatedRow = false)}
+            />
+          {/if}
+        </div>
       {/each}
     {/if}
   </div>
@@ -416,6 +432,7 @@
   .success-bar {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 8px 12px;
     background: color-mix(in srgb, var(--success) 13%, var(--bg));

@@ -59,8 +59,8 @@
       class="btn-kill"
       onclick={() => onKill(entry.pid)}
       disabled={killBlocked}
-      title={killBlocked ? "Needs admin — relaunch as admin to kill" : "Kill process"}
-      aria-label="Kill {entry.process_name}"
+      title={killBlocked ? "Needs admin — relaunch as admin to close" : "Close process"}
+      aria-label="Close {entry.process_name}"
     >
       <Icon name="x" size={14} />
     </button>
