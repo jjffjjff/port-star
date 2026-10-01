@@ -4,6 +4,7 @@
 
   let {
     entry,
+    grouped = false,
     isElevated,
     onKill,
     onOpen,
@@ -11,6 +12,7 @@
     onElevatedLeave = () => {},
   }: {
     entry: PortEntry;
+    grouped?: boolean;
     isElevated: boolean;
     onKill: (pid: number) => void;
     onOpen: (port: number) => void;
@@ -23,6 +25,7 @@
 
 <div
   class="row port-row"
+  class:grouped
   tabindex="0"
   role="button"
   onmouseenter={() => { if (entry.needs_elevation) onElevatedHover(); }}
@@ -75,6 +78,11 @@
     padding: 0 12px;
     gap: 11px;
     border-bottom: 1px solid var(--border);
+  }
+
+  .row.grouped {
+    box-shadow: inset 2px 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+    padding-left: 18px;
   }
 
   .row:hover,
