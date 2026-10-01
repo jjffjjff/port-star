@@ -2,6 +2,8 @@
 
 Windows system-tray utility that shows every listening TCP port with its process name, icon, and a kill button.
 
+![port-star popover](screenshot.png)
+
 ## What it does
 
 - Click the tray icon to open a compact frameless popover anchored at your cursor
