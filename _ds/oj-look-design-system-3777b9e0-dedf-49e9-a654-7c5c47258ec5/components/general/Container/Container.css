@@ -1,5 +1,0 @@
-.db-container {
-  max-width: var(--db-container-max);
-  margin: 0 auto;
-  padding: 0 var(--db-space-xl);
-}

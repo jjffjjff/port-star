@@ -1,7 +1,0 @@
-:root {
-  /* ── Tight radius — never pills. Consumer rounding reads wrong next to technical elements. ── */
-  --db-radius-input: 4px;    /* tight, structured */
-  --db-radius-button: 6px;   /* not a consumer pill */
-  --db-radius-card: 8px;     /* subtle softening */
-  --db-radius-none: 0px;     /* globe panel — technical clarity */
-}
