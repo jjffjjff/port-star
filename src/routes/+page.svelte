@@ -60,7 +60,7 @@
   // Render items: interleave GroupHeaders for multi-port processes
   type RenderItem =
     | { kind: "header"; name: string; count: number }
-    | { kind: "row"; entry: PortEntry };
+    | { kind: "row"; entry: PortEntry; grouped: boolean };
 
   let renderItems = $derived.by((): RenderItem[] => {
     const items: RenderItem[] = [];
@@ -69,7 +69,7 @@
         items.push({ kind: "header", name, count: entries.length });
       }
       for (const e of entries) {
-        items.push({ kind: "row", entry: e });
+        items.push({ kind: "row", entry: e, grouped: entries.length >= 2 });
       }
     }
     return items;
@@ -327,7 +327,7 @@
     <div class="success-bar"><Icon name="check-circle" size={15} /><span>{killSuccess}</span></div>
   {/if}
 
-  {#if hasElevatedProcesses}
+  {#if hasElevatedProcesses && !isElevated}
     <button
       class="mini-shield-btn"
       class:hinted={hoveringElevatedRow}
@@ -358,6 +358,7 @@
           {:else if item.kind === "row"}
             <PortRow
               entry={item.entry}
+              grouped={item.grouped}
               {isElevated}
               onKill={handleKill}
               onOpen={handleOpen}

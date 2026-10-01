@@ -156,6 +156,10 @@ fn extract_icon_b64(_exe_path: &str) -> Option<String> {
 
 #[cfg(target_os = "windows")]
 fn process_needs_elevation(pid: u32) -> bool {
+    // Already elevated: admin can't help, so don't flag it as "needs admin".
+    if is_app_elevated() {
+        return false;
+    }
     unsafe {
         match OpenProcess(PROCESS_TERMINATE, false, pid) {
             Ok(handle) => {
