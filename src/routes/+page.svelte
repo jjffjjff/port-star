@@ -327,7 +327,7 @@
     <div class="success-bar"><Icon name="check-circle" size={15} /><span>{killSuccess}</span></div>
   {/if}
 
-  {#if hasElevatedProcesses}
+  {#if hasElevatedProcesses && !isElevated}
     <button
       class="mini-shield-btn"
       class:hinted={hoveringElevatedRow}

@@ -44,11 +44,6 @@
 </script>
 
 <div class="settings" transition:slide={{ duration: 180, axis: 'y' }}>
-  <div class="settings-header">
-    <span class="title">Settings</span>
-    <button class="close-btn" onclick={onClose} aria-label="Close settings"><Icon name="x" size={13} /></button>
-  </div>
-
   <div class="setting-row">
     <label for="autostart-toggle">Launch at startup</label>
     {#if loading}
@@ -90,7 +85,7 @@
   </div>
 
   <div class="setting-row">
-    <label>Quit PortStar</label>
+    <label>Quit</label>
     <button class="quit-btn" onclick={() => invoke("quit_app")}>Quit</button>
   </div>
 </div>
@@ -99,38 +94,6 @@
   .settings {
     border-bottom: 1px solid var(--border);
     background: var(--bg-elevated);
-  }
-
-  .settings-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px 6px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .title {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--fg-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .close-btn {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-input);
-    color: var(--fg-muted);
-  }
-
-  .close-btn:hover {
-    background: var(--border);
-    color: var(--fg);
   }
 
   .setting-row {
