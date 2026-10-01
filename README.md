@@ -21,7 +21,6 @@ Tauri 2 (Rust) + Svelte 5 + TypeScript. Windows only.
 - [Node.js](https://nodejs.org/) 18+
 - [pnpm](https://pnpm.io/) 8+
 - [Rust](https://www.rust-lang.org/tools/install) stable (via rustup)
-- Windows 10+ (required by the Win32 APIs used for icon extraction and elevation)
 
 ## Dev
 
@@ -30,8 +29,7 @@ pnpm install
 pnpm tauri dev
 ```
 
-First Rust build takes a few minutes; incremental rebuilds are ~10s. The window starts hidden — left-click the tray icon to open it. Right-click for Show / Quit.
-
+First Rust build takes a few minutes; incremental rebuilds are ~10s.
 ## Build
 
 ```sh
